@@ -1,13 +1,26 @@
 import { Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataContacts } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
+import { useState, useEffect } from "react";
 
 const Contacts = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [data, setData] = useState([])
+
+  function getRndInteger(min, max) {return Math.floor(Math.random() * (max - min) ) + min}
+
+  useEffect(() => {
+
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(response => response.json())
+      .then(json =>
+        json.map(({ id, name, phone, website, address }) => ({ id, name, phone, email: website, age: getRndInteger(19,100), 'address': address.street, 'city': address.city, 'zipCode': address.suite, registrarId: getRndInteger(1000,9000) }))
+      )
+      .then(data => {setData(data)})
+  }, [])
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
@@ -91,7 +104,7 @@ const Contacts = () => {
         }}
       >
         <DataGrid
-          rows={mockDataContacts}
+          rows={data}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
         />
