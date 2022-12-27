@@ -1,15 +1,27 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataTeam } from "../../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
+import { useState, useEffect } from "react";
 
 const Team = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const colors = tokens(theme.palette.mode)
+  const [data, setData] = useState([])
+  function getRndInteger(min, max) { return Math.floor(Math.random() * (max - min)) + min }
+
+  useEffect(() => {
+
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(response => response.json())
+      .then(json =>
+        json.map(({ id, name, phone, website }) => ({ id, name, phone, email: website, age: getRndInteger(19, 100), access: getRndInteger(0, 2) === 1 ? 'manager' : 'admin' }))
+      )
+      .then(data => { setData(data) })
+  }, [])
   const columns = [
     { field: "id", headerName: "ID" },
     {
@@ -51,8 +63,8 @@ const Team = () => {
               access === "admin"
                 ? colors.greenAccent[600]
                 : access === "manager"
-                ? colors.greenAccent[700]
-                : colors.greenAccent[700]
+                  ? colors.greenAccent[700]
+                  : colors.greenAccent[700]
             }
             borderRadius="4px"
           >
@@ -100,7 +112,7 @@ const Team = () => {
           },
         }}
       >
-        <DataGrid checkboxSelection rows={mockDataTeam} columns={columns} />
+        <DataGrid checkboxSelection rows={data} columns={columns} />
       </Box>
     </Box>
   );
